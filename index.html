@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Juego simple: Atrapa el cuadro</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: #111827;
+      color: #e5e7eb;
+    }
+
+    .game {
+      width: min(92vw, 460px);
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 1.25rem;
+      text-align: center;
+    }
+
+    p {
+      margin: 0 0 12px;
+      text-align: center;
+      color: #cbd5e1;
+    }
+
+    .hud {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 0 0 12px;
+      font-weight: 700;
+    }
+
+    .board {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: #0f172a;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid #334155;
+      cursor: crosshair;
+      user-select: none;
+    }
+
+    .target {
+      position: absolute;
+      width: 54px;
+      height: 54px;
+      border-radius: 10px;
+      background: linear-gradient(145deg, #22d3ee, #0ea5e9);
+      box-shadow: 0 8px 18px rgba(14, 165, 233, 0.4);
+      transition: transform 120ms ease;
+    }
+
+    .target:active {
+      transform: scale(0.95);
+    }
+
+    .actions {
+      margin-top: 14px;
+      text-align: center;
+    }
+
+    button {
+      border: none;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      color: #0b1120;
+      background: #facc15;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <h1>Atrapa el cuadro</h1>
+    <p>Haz clic en el cuadro azul tantas veces como puedas en 20 segundos.</p>
+
+    <section class="hud">
+      <span>Puntos: <strong id="score">0</strong></span>
+      <span>Tiempo: <strong id="time">20</strong>s</span>
+      <span>Récord: <strong id="best">0</strong></span>
+    </section>
+
+    <section class="board" id="board" aria-label="Tablero de juego">
+      <button class="target" id="target" aria-label="Objetivo"></button>
+    </section>
+
+    <div class="actions">
+      <button id="restart">Reiniciar</button>
+    </div>
+  </main>
+
+  <script>
+    const GAME_SECONDS = 20;
+    const board = document.getElementById('board');
+    const target = document.getElementById('target');
+    const scoreEl = document.getElementById('score');
+    const timeEl = document.getElementById('time');
+    const bestEl = document.getElementById('best');
+    const restartBtn = document.getElementById('restart');
+
+    let score = 0;
+    let timeLeft = GAME_SECONDS;
+    let timerId = null;
+    let gameOver = false;
+
+    const best = Number(localStorage.getItem('bestScore') || 0);
+    bestEl.textContent = String(best);
+
+    function moveTarget() {
+      const boardRect = board.getBoundingClientRect();
+      const targetSize = target.getBoundingClientRect().width;
+      const maxX = boardRect.width - targetSize;
+      const maxY = boardRect.height - targetSize;
+      const x = Math.random() * maxX;
+      const y = Math.random() * maxY;
+      target.style.left = `${x}px`;
+      target.style.top = `${y}px`;
+    }
+
+    function endGame() {
+      gameOver = true;
+      clearInterval(timerId);
+      timerId = null;
+      target.disabled = true;
+
+      const currentBest = Number(localStorage.getItem('bestScore') || 0);
+      if (score > currentBest) {
+        localStorage.setItem('bestScore', String(score));
+        bestEl.textContent = String(score);
+      }
+    }
+
+    function resetGame() {
+      score = 0;
+      timeLeft = GAME_SECONDS;
+      gameOver = false;
+      scoreEl.textContent = '0';
+      timeEl.textContent = String(timeLeft);
+      target.disabled = false;
+      moveTarget();
+
+      if (timerId) clearInterval(timerId);
+      timerId = setInterval(() => {
+        timeLeft -= 1;
+        timeEl.textContent = String(timeLeft);
+
+        if (timeLeft <= 0) {
+          endGame();
+        }
+      }, 1000);
+    }
+
+    target.addEventListener('click', () => {
+      if (gameOver) return;
+      score += 1;
+      scoreEl.textContent = String(score);
+      moveTarget();
+    });
+
+    restartBtn.addEventListener('click', resetGame);
+    window.addEventListener('resize', moveTarget);
+
+    resetGame();
+  </script>
+</body>
+</html>
