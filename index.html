@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timer de Rutina</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app">
+      <h1>Rutina de empuje (calistenia)</h1>
+      <p class="subtitle">Controla series, tiempos de trabajo y descansos de forma automática.</p>
+
+      <section class="panel">
+        <h2>Ejercicio actual</h2>
+        <p id="phaseLabel" class="phase">Listo para empezar</p>
+        <p id="exerciseName" class="exercise">Fondos en paralelas</p>
+        <div class="timer" id="timer">00:00</div>
+        <p id="setInfo" class="set-info">Serie 0 de 0</p>
+
+        <div class="actions">
+          <button id="startBtn">Iniciar</button>
+          <button id="pauseBtn" disabled>Pausar</button>
+          <button id="resetBtn">Reiniciar</button>
+          <button id="skipBtn" disabled>Saltar fase</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Rutina configurada</h2>
+        <ul id="routineList"></ul>
+        <p class="hint">Descanso: <strong>90 s</strong> ejercicios principales / <strong>60 s</strong> accesorios</p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
